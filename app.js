@@ -1,17 +1,19 @@
-// este archivo es el punto de entrada de la API (arranca el servidor, configura express, carga las rutas, deja la API escuchando peticiones)
+// este archivo es el punto de entrada de la API (arranca el servidor, configura express, 
+// conecta la base de datos, carga las rutas, deja la API escuchando peticiones)
 import 'dotenv/config' // carga de variables de entorno
 import express from 'express'; // framework que crea el servidor HTTP
 import routesMascotas from './routes/mascotas.js' // grupo de rutas
-import bodyParser from 'body-parser'; // permite leer el cuerpo de las peticiones
+import bodyParser from 'body-parser'; // permite leer el cuerpo de las peticiones y convertir JSON en objetos JS
+import dbClient from './config/dbClient.js'; // se crea la instancia de dbClient, se ejecuta su constructor y se conecta automáticamente a MongoDB
 
-const app = express(); // creo una instancia de express
+const app = express(); // creo una instancia de Express
 
 app.use(bodyParser.json()); // indico que los datos sean procesados como json
 app.use(bodyParser.urlencoded({extended: true})); // permito que Express entienda formularios
 
 app.use('/mascotas', routesMascotas); // le indico que use las rutas
 
-// inicio el servidor
+// inicio el servidor, abre el puerto y empieza a escuchar peticiones
 try {
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => console.log('Servidor activo en el puerto ' + PORT));
@@ -19,8 +21,8 @@ try {
     console.error(error);
 }
 
-
-// TUTORIAL 1: https://www.youtube.com/watch?v=BfYOo5yjeWk&list=PLC1WMptQ1CNDzOj8V_MS0m8-LVCUH-O3p&index=13
-// TUTORIAL 2: https://www.youtube.com/watch?v=BKlcgxNYOfI&list=PLC1WMptQ1CNDzOj8V_MS0m8-LVCUH-O3p&index=14
-// 2:11
-
+// se ejecuta cuando pulso CTRL + C, cierra la conexión con MongoDB
+process.on('SIGINT', async() => {
+    dbClient.cerrarConexion();
+    process.exit(0);
+});

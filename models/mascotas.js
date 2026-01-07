@@ -1,32 +1,34 @@
-// este archivo habla directamente con MongoDB (inserta, actualiza, borra y lee datos)
-// MongoDB usa _id de tipo ObjectId, cuando el id llega por la URL, llega como string, hay que convertirlo a ObjectId para poder buscarlo
-import { ObjectId } from "mongodb";
-import dbClient from "../config/dbClient.js" // conexión a MongoDB
+// Este archivo habla directamente con MongoDB (inserta, actualiza, borra y lee datos)
+import mongoose from 'mongoose';
+import Mascota from "../schemas/mascotas.js";
 class mascotasModel {
-     async create(mascota) {
-        const colMascotas = dbClient.db.collection('mascotas'); // accedo a la colección
-        return await colMascotas.insertOne(mascota);  // inserta el objeto recibido, MongoDB devuelve insertedId y acknowledged, el controlador recibe el resultado y lo envía al cliente
-     }
+  // Método que recibe un objeto mascota (viene del controlador), lo valida contra el schema y lo guarda en MongoDB
+  async create(mascota) {
+    return await Mascota.create(mascota);
+  }
 
-     async update(id, mascota) {
-      const colMascotas = dbClient.db.collection('mascotas'); // accedo a la colección 
-        return await colMascotas.updateOne({_id: new ObjectId(id)}, { $set: mascota}); // el id llega como texto desde la URL, lo convierto a ObjectId, $set actualiza solo los campos enviados, MongoDB devuelve matchedCount y modifiedCount
-     }
+  // Método que convierte el id que llega como string desde la URL en un ObjectId (new mongoose.Types.ObjectId(id))
+  // findOneAndUpdate busca la mascota por _id, actualiza los campos enviados, y devuelve la mascota ya actualizada
+  async update(id, mascota) {
+    return await Mascota.findOneAndUpdate({ _id: new mongoose.Types.ObjectId(id) }, mascota, { new: true });
+  }
 
-     async delete(id) {
-      const colMascotas = dbClient.db.collection('mascotas'); // accedo a la colección 
-        return await colMascotas.deleteOne({_id: new ObjectId(id)}); // el id llega como texto desde la URL, lo convierto a ObjectId, busco por _id y borro el documento, MongoDB devuelve deletedCount
-     }
+  // Método que convierte el id que llega como string desde la URL en un ObjectId (new mongoose.Types.ObjectId(id))
+  // Busca una mascota por su ID , la elimina de la base de datos y devuelve la mascota eliminada, si no existe devuelve null
+  async delete(id) {
+    return await Mascota.findOneAndDelete({ _id: new mongoose.Types.ObjectId(id) }); // busco por el id y lo elimino
+  }
 
-     async getAll(){
-      const colMascotas = dbClient.db.collection('mascotas'); // accedo a la colección 
-      return await colMascotas.find({}).toArray(); // find({}) busca todos, toArray() convierte el cursor en array, devuelve una lista de mascotas
-     }
+  // Método que busca todas las mascotas, devuelve un array
+  async getAll() {
+    return await Mascota.find();
+  }
 
-     async getOne(id){
-      const colMascotas = dbClient.db.collection('mascotas'); // accedo a la colección 
-      return await colMascotas.findOne({_id: new ObjectId(id)}); // busca una sola mascota por id, devuelve el documento o null
-     }
+  // Método que busca una mascota por su ID, devuelve un solo objeto, si no existe devuelve null
+  async getOne(id) {
+    return await Mascota.findById(id);
+  }
 }
 
-export default new mascotasModel;
+// creo una instancia, la exporto para que el controlador pueda usar mascotasModel.getAll()
+export default new mascotasModel();
