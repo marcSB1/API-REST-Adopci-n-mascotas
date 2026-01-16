@@ -1,16 +1,13 @@
-// este archivo controla que método del controlador usar si alguien llama a la URL con un método HTTP
+// Decide qué método del controlador se ejecuta según la URL y el método HTTP
 import express from 'express';
-
-// constante para gestionar las rutas
-const route = express.Router();
-
-// importo la clase mascotasController para usar sus métodos get post put delete
-import mascotaController from '../controllers/mascotas.js'
+const route = express.Router(); // Router de Express para agrupar rutas de usuarios
+import mascotaController from '../controllers/mascotas.js' // importo la clase mascotasController para usar sus métodos get post put delete
+import { verificarToken } from '../helpers/autenticacion.js';
 
 route.post('/', mascotaController.create);
 route.get('/:id', mascotaController.getOne);
 route.get('/', mascotaController.getAll);
-route.put('/:id', mascotaController.update);
-route.delete('/:id', mascotaController.delete);
+route.put('/:id', verificarToken, mascotaController.update);
+route.delete('/:id', verificarToken, mascotaController.delete);
 
 export default route;
