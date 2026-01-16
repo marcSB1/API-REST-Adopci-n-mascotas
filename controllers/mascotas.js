@@ -8,8 +8,9 @@ class mascotasController {
 
     // método que se usa cuando el cliente hace POST /mascotas
     async create(req, res) {
+        const { nombre, tipo, raza, edad, descripcion, adoptado } = req.body; // destructuring para que swagger detecte los campos exactos
         try {
-            const data = await mascotasModel.create(req.body); // le digo al modelo que cree una mascota con los datos que llegan del cliente, await espera a que MongoDB termine
+            const data = await mascotasModel.create({ nombre, tipo, raza, edad, descripcion, adoptado }); // le digo al modelo que cree una mascota con los datos que llegan del cliente, await espera a que MongoDB termine
             res.status(201).json(data); // devuelvo la mascota creada
         } catch (error) {
             res.status(500).send(error);
@@ -19,9 +20,10 @@ class mascotasController {
 
     // método que se usa cuando el cliente hace PUT /mascotas/:id
     async update(req, res) {
+        const { nombre, tipo, raza, edad, descripcion, adoptado } = req.body; // destructuring para que swagger detecte los campos exactos
         try {
             const { id } = req.params; // obtengo el id
-            const data = await mascotasModel.update(id, req.body); // le digo al modelo que actualice una mascota con los datos que llegan del cliente, await espera a que MongoDB termine
+            const data = await mascotasModel.update(id, { nombre, tipo, raza, edad, descripcion, adoptado }); // le digo al modelo que actualice una mascota con los datos que llegan del cliente, await espera a que MongoDB termine
             res.status(201).json(data); // devuelvo la mascota actualizada
         } catch (error) {
             res.status(500).send(error);

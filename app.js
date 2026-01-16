@@ -9,9 +9,15 @@ import dbClient from './config/dbClient.js'; // se crea la instancia de dbClient
 
 const app = express(); // creo una instancia de Express
 
+import swaggerUI from 'swagger-ui-express';
+import swaggerDocumentation from './swagger.json' with {type: 'json'}; // importo el archivo swagger.json que he generado antes
+
+
+
 app.use(bodyParser.json()); // indico que los datos sean procesados como json
 app.use(bodyParser.urlencoded({extended: true})); // permito que Express entienda formularios
 
+app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerDocumentation));
 app.use('/pets', routesMascotas); // le indico que use las rutas
 app.use('/users', routesUsuarios);
 
